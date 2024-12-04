@@ -81,7 +81,19 @@ router.delete('/:id', async (req, res) => {
 router.get('/trends', async (req, res) => {
   try {
     const trends = await Shoe.find().sort({ sales: -1 }).limit(8);
-    res.status(200).json(trends);
+    // Mapea las imágenes a base64 para facilitar su uso en el front
+    const formattedTrends = trends.map((shoe) => ({
+      _id: shoe._id,
+      shoeId: shoe.shoeId,
+      description: shoe.description,
+      category: shoe.category,
+      uploadDate: shoe.uploadDate,
+      sales: shoe.sales,
+      image: `data:${shoe.image.contentType};base64,${shoe.image.data.toString(
+        'base64',
+      )}`,
+    }));
+    res.status(200).json(formattedTrends);
   } catch (err) {
     res.status(500).send('Error al obtener las tendencias: ' + err.message);
   }
